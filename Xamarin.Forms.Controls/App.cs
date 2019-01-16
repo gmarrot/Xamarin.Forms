@@ -75,7 +75,8 @@ namespace Xamarin.Forms.Controls
 
 			// Hand off to website for sign in process
 			var view = new WebView { Source = new Uri("http://google.com") };
-			view.Navigated += (s, e) => MainPage.DisplayAlert("Navigated", $"If this popup appears multiple times, this test has failed", "ok"); ;
+			view.Navigated += (s, e) => MainPage.DisplayAlert("Navigated", $"If this popup appears multiple times, this test has failed", "ok");
+			;
 
 			MainPage.Navigation.PushAsync(new ContentPage { Content = view, Title = "Issue 2393" });
 			//// Uncomment to verify that there is no gray screen displayed between the blue splash and red MasterDetailPage.
@@ -106,28 +107,55 @@ namespace Xamarin.Forms.Controls
 
 		public Page CreateDefaultMainPage()
 		{
-			var layout = new StackLayout { BackgroundColor = Color.Red };
-			layout.Children.Add(new Label { Text = "This is master Page" });
-			var master = new ContentPage { Title = "Master", Content = layout, BackgroundColor = Color.SkyBlue, Icon ="menuIcon" };
-			master.On<iOS>().SetUseSafeArea(true);
-			var mdp = new MasterDetailPage
+			Device.SetFlags(new[] { "Visual_Experimental" });
+
+			return new ContentPage()
 			{
-				AutomationId = DefaultMainPageId,
-				Master = master,
-				Detail = CoreGallery.GetMainPage()
+				Visual = VisualMarker.Material,
+				Content = new StackLayout()
+				{
+					Children =
+					{
+						new BoxView()
+						{
+							HeightRequest = 100,
+							BackgroundColor = Color.Green,
+								HorizontalOptions = LayoutOptions.FillAndExpand
+						},
+						new BoxView()
+						{
+							HeightRequest = 100,
+							BackgroundColor = Color.Pink,
+								HorizontalOptions = LayoutOptions.FillAndExpand
+						},
+						new StackLayout()
+						{
+							Children =
+							{
+								new Entry()
+								{
+									Text = "Default Entry",
+									HorizontalOptions = LayoutOptions.FillAndExpand
+								},
+								new Entry()
+								{
+									Text = "Default Entry",
+									HorizontalOptions = LayoutOptions.FillAndExpand
+								},
+							},
+							Orientation = StackOrientation.Horizontal
+
+						},
+						new Entry()
+						{
+							Text = "Default Entry"
+						}
+					}
+				}
 			};
-			master.Icon.AutomationId = "btnMDPAutomationID";
-			mdp.SetAutomationPropertiesName("Main page");
-			mdp.SetAutomationPropertiesHelpText("Main page help text");
-			mdp.Master.Icon.SetAutomationPropertiesHelpText("This as MDP icon");
-			mdp.Master.Icon.SetAutomationPropertiesName("MDPICON");
-			return mdp;
+		}
 
-			//Device.SetFlags(new[] { "Shell_Experimental" });
-            //return new XamStore.StoreShell();
-        }
-
-        protected override void OnAppLinkRequestReceived(Uri uri)
+		protected override void OnAppLinkRequestReceived(Uri uri)
 		{
 			var appDomain = "http://" + AppName.ToLowerInvariant() + "/";
 
